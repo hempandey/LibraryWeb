@@ -1,0 +1,231 @@
+﻿@model LibraryWeb.Author
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>Edit</h2>
+<form class="form-horizontal" autocomplete="off">
+    @Html.HiddenFor(model => model.Id)
+    <div class="form-group">
+        <label for="txtName" class="col-sm-2 control-label">Name</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" data-required="true" value="@Model.Name" id="txtName" placeholder="Name">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="txtDoB" class="col-sm-2 control-label">DoB</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" value="@Model.DoB" id="txtDoB" placeholder="DoB">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="txtEmail" class="col-sm-2 control-label">Email</label>
+        <div class="col-sm-10">
+            <input type="email" class="form-control" disabled data-required="true" value="@Model.Email" id="txtEmail" placeholder="Email">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="txtPhone" class="col-sm-2 control-label">Phone</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" value="@Model.Phone" id="txtPhone" placeholder="Phone">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <input type="button" value="Save" class="btn btn-primary" id="btnSaveAuthor">
+    </div>
+
+
+</form>
+
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(function () {
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+
+            if ($('#txtDoB').val()!="") {
+                var date = $.dateOnly($('#txtDoB').val());
+                if (date === false) {
+                    $('#txtDoB').val('');
+                } else {
+                    //var res = $('#txtDoB').val().substring(0, 10).trim();
+                    $('#txtDoB').val(date);
+                }
+                
+            }
+           
+
+            //$('body').on('change', $('#txtDoB'), function () {
+            //    var dt = $.dateOnly($('#txtDoB').val());
+            //    if (dt === false) {
+            //        ////$('#txtDoB').val('');
+            //            toastr.error('Dob should be in MM/DD/YYYY .', 'Validation Error')
+            //            $('#txtDoB').val('');
+            //            return false;
+            //    } else {
+            //        $('#txtDoB').val(dt);
+            //    }
+                
+            //});
+
+
+            //$("#txtDoB").blur(function () {
+            //    var v = $(this).val();
+            //    if (v === "") {
+                    
+            //    } else {
+            //        var dt = $.dateOnly($('#txtDoB').val());
+            //        if (dt === false) {
+            //            $('#txtDoB').val('');
+            //        } else {
+            //            $('#txtDoB').val(dt);
+            //        }
+            //    }
+            //});
+
+
+
+            $("input[data-required]").blur(function () {
+                var v = $(this).val();
+                if (v === "") {
+                    $(this).addClass('invalid');
+                } else {
+                    $(this).removeClass('invalid');
+                }
+            });
+        });
+
+       
+        $.dateOnly = function (dateObject) {            
+            var d = new Date(dateObject);
+            var res = d.toString();
+            if (res === 'Invalid Date') {
+
+                return false;
+            }
+            var day = d.getDate();
+            var month = d.getMonth() + 1;
+            var year = d.getFullYear();
+            if (day < 10) {
+                day = "0" + day;
+            }
+            if (month < 10) {
+                month = "0" + month;
+            }
+           // var date = day + "/" + month + "/" + year;
+            var date = month + "/" + day + "/" + year;
+
+            return date;
+        };
+        
+
+        function validateDate(date) {
+            var date_regex = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/;
+            return date_regex.test(date);
+        }
+
+
+        function ValidateEmail(email) {
+            // Validate email format
+            var expr = /^[\w\-\.\+]+\@@[a-zA-Z0-9\.\-]+\.[a-zA-z0-9]{2,4}$/;
+            return expr.test(email);
+        };
+
+
+        function validateForm() {
+            if ($('#txtName').val() === "") {
+                toastr.error('Name is required.', 'Validation Error')
+                return false;
+            }
+
+            if ($('#txtDoB').val() === "") {
+                toastr.error('DoB is required.', 'Validation Error')
+                return false;
+            }
+            if (!validateDate($('#txtDoB').val())) {
+                toastr.error('Invalid date of birth, Dob should be in MM/DD/YYYY format.', 'Validation Error')
+                return false;
+            }
+
+            if ($("#txtEmail").val() === "") {
+                toastr.error(' Email Address is required!', 'Validation Error')
+                return false;
+            }
+            if (!ValidateEmail($("#txtEmail").val())) {
+                toastr.error(' Email address is not valid!', 'Validation Error')
+                return false;
+
+            }
+
+            if ($('#txtPhone').val() === "") {
+                toastr.error('Phone number is required.', 'Validation Error')
+                return false;
+            }
+            return true;
+        };
+
+
+        $('#btnSaveAuthor').click(function () {
+            if (validateForm()) {
+                ////STEP 2:  Created js Object to get Author form data using jQuery selectors
+                var AuthorObj = {
+                    Id: $('#Id').val(),
+                    Name: $('#txtName').val(),
+                    DoB: $('#txtDoB').val(),
+                    Email: $('#txtEmail').val(),
+                    Phone: $('#txtPhone').val(),
+                };
+
+
+                var data = { 'author': AuthorObj };
+
+                $.ajax({
+                    type: 'post',
+                    url: "@Url.Action("Edit", "Authors")",
+                    data: data,
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.Success) {
+                            var url = "/Authors/Index";
+                            window.location.href = url;
+                        } else {
+                            toastr.error(result.Message, 'Error')
+                            return false;
+                        }
+                    },
+
+                    //error: function (request, status, error) {
+                    //    toastr.error(error.statusText, 'Error')
+                    //    return false;
+                    //}
+                });
+
+            }
+
+        });
+    </script>
+}

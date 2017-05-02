@@ -1,0 +1,117 @@
+﻿@model LibraryWeb.Book
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+ }
+
+<h2>Edit</h2>
+<div class="form-horizontal">
+    <h4>Book</h4>
+    <hr />
+    <form class="form-horizontal" autocomplete="off">
+        @Html.HiddenFor(model => model.ID)
+        <div class="form-group">
+            <label for="ddlAuthorID" data-required="true" class="col-sm-2 control-label">Author Name</label>
+            <div class="col-sm-10">
+                @Html.DropDownList("AuthorID", null, htmlAttributes: new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="txtBookName" class="col-sm-2 control-label">Book Name</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" data-required="true"  value="@Model.BookName" id="txtBookName" placeholder="Book Name">
+            </div>
+        </div>
+        <div class="form-group" >
+            <label for="txtDescription" class="control-label col-md-2"> Description </label>
+            <div class="col-md-10">
+                <textarea  id="txtDescription" class="form-control"   cols="50" rows="4">@Model.Description</textarea>
+               
+            </div>
+        </div>
+        <div class="form-group">
+            <input type="button" value="Save" class="btn btn-primary" id="btnSaveBook">
+
+        </div>
+</form>
+    </div>
+<div>
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+
+@section Scripts {
+<script type="text/javascript">
+
+        $(function () {
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+            $("input[data-required]").blur(function () {
+                var v = $(this).val();
+                if (v === "") {
+                    $(this).addClass('invalid');
+                } else {
+                    $(this).removeClass('invalid');
+                }
+            });
+        });
+        
+        function validateForm() {
+            if ($('#AuthorID').val() === "0") {
+                toastr.error('Author is required.', 'Validation Error')
+                return false;
+            }
+
+            if ($('#txtBookName').val() === "") {
+                toastr.error('Book Name is required.', 'Validation Error')
+                return false;
+            }
+            return true;
+        };
+
+        $('#btnSaveBook').click(function () {
+
+            if (validateForm()) {
+                var BookObj = {
+                    ID: $('#ID').val(),
+                    AuthorID: $('#AuthorID').val(),
+                    BookName: $('#txtBookName').val(),
+                    Description: $('#txtDescription').val(),
+                };
+                var data = { 'book': BookObj };
+
+                $.ajax({
+                    type: 'post',
+                    url: "@Url.Action("Edit", "Books")",
+                    data: data,
+                    dataType: 'json',
+                    success: function (result) {
+                    if (result.Success) {
+                        var url = "/Books/Index";
+                        window.location.href = url;
+                    } else {
+                        toastr.error(result.Message, 'Error')
+                        return false;
+                    }
+                    },
+                });
+            }
+        });
+
+</script>
+}

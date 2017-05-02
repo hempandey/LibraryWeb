@@ -1,0 +1,102 @@
+﻿@model LibraryWeb.Author
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Author</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DoB)
+        </dt>
+
+        <dd class="AuthorDob">
+            @Html.DisplayFor(model => model.DoB)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Phone)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Phone)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
+
+
+@section Scripts {
+
+    <script type="text/javascript">
+
+
+
+        $(function () {
+           
+            var dob=$("dd.AuthorDob").text();                   
+            if (dob != "") {
+                var date = $.dateOnly(dob);
+                if (date === false) {
+                    $("dd.AuthorDob").text('');
+                } else {
+                    $("dd.AuthorDob").text(date);
+                }
+
+            }
+               
+
+
+
+        });
+
+
+
+        $.dateOnly = function (dateObject) {
+            var d = new Date(dateObject);
+            var res = d.toString();
+            if (res === 'Invalid Date') {
+
+                return false;
+            }
+            var day = d.getDate();
+            var month = d.getMonth() + 1;
+            var year = d.getFullYear();
+            if (day < 10) {
+                day = "0" + day;
+            }
+            if (month < 10) {
+                month = "0" + month;
+            }
+            // var date = day + "/" + month + "/" + year;
+            var date = month + "/" + day + "/" + year;
+
+            return date;
+        };
+    </script>
+
+}

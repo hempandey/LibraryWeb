@@ -1,0 +1,276 @@
+﻿@*@model IEnumerable<LibraryWeb.Author>*@
+@using LiberaryWeb.ViewModels
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+.
+<!-- Setting Kendo Grid - START -->
+
+@(Html.Kendo().Grid<AuthorViewModel>()
+    .Name("AuthorGrid")
+    .Columns(columns =>
+    {
+        columns.Bound(o => o.Id).Groupable(false);
+        columns.Bound(o => o.Name);
+        columns.Bound(o => o.DoB);
+        columns.Bound(o => o.Email);
+        columns.Bound(o => o.Phone);
+    })
+    .Pageable()
+    .Sortable()
+    .Filterable()
+    .Scrollable()
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Read(read => read.Action("CustomAjaxBinding_Read", "Authors"))
+    )
+)
+
+
+
+
+
+<table class="table" id="tblAuthoreInfo">
+
+    <tr>
+        <th>Id</th>
+        <th>Author Name</th>
+        <th>Email</th>
+        <th>Dob</th>
+        <th>Phone</th>
+        <th></th>
+    </tr>
+    
+</table>
+
+
+
+<!-- Modal Start-->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <!-- Model Header-->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Author Details</h4>
+            </div>
+            <!-- Model Header End-->
+            <!-- Model Body-->
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Id</label>
+                        <div class="col-sm-8 col-md-6">
+                            <span id="spnAuthId"></span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Author Name</label>
+                        <div class="col-sm-8 col-md-6">
+                            <span id="spnAuthName"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" >Email</label>
+                        <div class="col-sm-8 col-md-6">
+                            <span id="spnAuthEmail"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="">Dob</label>
+                        <div class="col-sm-8 col-md-6">
+                            <span id="spnAuthDob"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="">Phone</label>
+                        <div class="col-sm-8 col-md-6">
+                            <span id="spnAuthPhone"></span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="modal-footer">
+                    @*<button type="button" class="btn btn-primary" id="btnModalAdd">Add</button>*@
+                    <button type="button" class="btn btn-primary" id="btnModalCancel" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- Model Body End-->
+
+        </div>
+    </div>
+</div>
+<!-- Modal End-->
+
+
+
+
+
+
+
+
+
+<!-- Setting Kendo Grid - END -->
+
+
+
+
+
+
+
+@section Scripts {
+
+    <script type="text/javascript">
+
+
+        //==== This  is document ready function
+        $(function () {
+
+
+
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+            $('#AuthorGrid').data('kendoGrid');
+
+
+            var ready="I am ready to work!"
+
+
+            ////=== call service side action to get authore list using ajax
+            @*$.ajax({                
+                url: "@Url.Action("GetAllAuthors", "Authors")",                
+                dataType: 'json',
+                success: function (response) {
+                   
+                    $.each(response, function (i, item) {
+                        $('#tblAuthoreInfo').append('<tr><td><a class="linkOpenModal" data-AuthId="' + item.Id + '" data-toggle="modal" data-target="#myModal" href="#">' + item.Id + '</a></td><td>' + item.Name + '</td><td>' + item.Email + '</td><td>' + item.DoB +
+                            '</td><td>' + item.Phone + '</td><td><a href="/authors/Edit/' + item.Id + '">Edit</a> | <a href="/authors/Details/' + item.Id + '">Details</a></td></tr>')
+                    });
+                    
+                },
+                error: function (request, status, error) {
+                    toastr.error(error.statusText, 'Error')
+                    return false;
+                }
+            });
+
+
+        //click code for Model 
+            $(document).on("click", '.linkOpenModal',function () {
+                        var Authid = $(this).attr("data-AuthId");
+
+                        var data = { 'id': Authid };
+                        $.ajax({                
+                            url: "@Url.Action("GetAuthorDetailsForModal", "Authors")",                
+                            dataType: 'json',
+                            data:data,
+                            success: function (response) {
+                   
+                                $('#spnAuthId').text(response.Id);
+                                $('#spnAuthName').text(response.Name);
+                                $('#spnAuthPhone').text(response.Phone);
+                                $('#spnAuthDob').text(response.DoB);
+                                $('#spnAuthEmail').text(response.Email);
+
+                                //var res = response;
+                            
+                    
+                        },
+                        error: function (request, status, error) {
+                            toastr.error(error.statusText, 'Error')
+                            return false;
+                        }
+            });
+
+
+
+                   });*@
+
+
+
+
+
+
+           
+
+                //$("#tblAuthoreInfo td.AuthorDob").each(function () {
+                //    var dob = $(this).text();
+                //    if (dob != "") {
+                //        var date = $.dateOnly(dob);
+                //        if (date === false) {
+                //            $(this).text('');
+                //        } else {                        
+                //            $(this).text(date)
+                //        }
+                //    }
+                //});
+
+
+
+        });
+
+        //$.dateOnly = function (dateObject) {
+        //    var d = new Date(dateObject);
+        //    var res = d.toString();
+        //    if (res === 'Invalid Date') {
+        //        return false;
+        //    }
+        //    var day = d.getDate();
+        //    var month = d.getMonth() + 1;
+        //    var year = d.getFullYear();
+        //    if (day < 10) {
+        //        day = "0" + day;
+        //    }
+        //    if (month < 10) {
+        //        month = "0" + month;
+        //    }
+        //    // var date = day + "/" + month + "/" + year;
+        //    var date = month + "/" + day + "/" + year;
+        //    return date;
+        //};
+        
+    
+    
+    
+    
+    
+    </script>
+
+    }

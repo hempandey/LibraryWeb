@@ -1,0 +1,208 @@
+﻿@model IEnumerable<LibraryWeb.Book>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+    <table class="table" id="tblBookInfo">
+
+        <tr>
+            <th>ID</th>
+            <th>Author Name</th>          
+            <th>BookName</th>
+            <th>Description</th>
+            <th></th>
+        </tr>
+
+
+
+    </table>
+
+
+
+
+
+
+<!-- Modal Start-->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <!-- Model Header-->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Book Details</h4>
+            </div>
+            <!-- Model Header End-->
+            <!-- Model Body-->
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">ID</label>
+                        <div class="col-sm-8 col-md-6">
+                            <span id="spnbookId"></span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">AuthorID</label>
+                        <div class="col-sm-8 col-md-6">
+                            <span id="spnbookAithorID"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Author Name</label>
+                        <div class="col-sm-8 col-md-6">
+                            <span id="spnAuthName"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Book Name</label>
+                        <div class="col-sm-8 col-md-6">
+                            <span id="spnBookName"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label class="control-label col-sm-4" for="">Discription</label>
+                        <div class="col-sm-8 col-md-6">
+                            <span id="spnbookDiscription"></span>
+                        </div>
+                    </div>
+                </div>
+
+          
+                <div class="modal-footer">
+                    @*<button type="button" class="btn btn-primary" id="btnModalAdd">Add</button>*@
+                    <button type="button" class="btn btn-primary" id="btnModalCancel" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- Model Body End-->
+
+        </div>
+    </div>
+</div>
+<!-- Modal End-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     @section Scripts {
+<script type="text/javascript">
+
+    //==== This  is document ready function
+    $(function () {
+
+
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+
+        
+
+        ////=== call service side action to get authore list using ajax
+        $.ajax({
+            url: "@Url.Action("GetBookDetailsForModal", "Books")",
+            dataType: 'json',
+            success: function (response) {
+
+                $.each(response, function (i, item) {
+                    $('#tblBookInfo').append('<tr><td><td><a class="linkOpenModal" data-bookId="' + item.ID + '" data-toggle="modal" data-target="#myModal" href="#">' + item.ID + '</a></td><td>' + item.AuthorName + '</td><td>' + item.BookName + '</td><td>' + item.Description +
+                        '<td><a href="/Books/Edit/' + item.ID + '">Edit</a> | <a href="/Books/Details/' + item.ID + '">Details</a></td></tr>')
+                });
+
+            },
+            error: function (request, status, error) {
+                toastr.error(error.statusText, 'Error')
+                return false;
+            }
+        });
+         
+        //click code for Model 
+        $(document).on("click", '.linkOpenModal',function () {
+            var bookid = $(this).attr("data-bookId");
+
+            var data = { 'id': bookid };
+            $.ajax({                
+                url: "@Url.Action("GetBookDetailsForModal", "Books")",                
+                dataType: 'json',
+            data:data,
+            success: function (response) {
+                   
+                $('#spnbookId').text(response.ID);
+                $('#spnbookAithorID').text(response.AuthorID);
+                $('#spnAuthName').text(response.AuthorName);
+                $('#spnBookName').text(response.BookName);
+                $('#spnbookDiscription').text(response.Discription);
+
+                //var res = response;
+                            
+                    
+            },
+            error: function (request, status, error) {
+                toastr.error(error.statusText, 'Error')
+                return false;
+            }
+        });
+
+
+
+    });
+
+
+    }); 
+</script>
+
+    }
